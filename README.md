@@ -82,9 +82,6 @@ Este proyecto sirve como una demostración práctica de:
 - Desarrollo de interfaces administrativas
 - Seguridad en aplicaciones web
 
-## 🤝 Contribución
-Las contribuciones son bienvenidas. Por favor, lee las guías de contribución antes de enviar un pull request.
-
 ## 📄 Licencia
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
@@ -94,5 +91,5 @@ Sergio david sepulveda
 ## 📞 Contacto
 - Email: sergiose534@gmail.com
 - LinkedIn: https://www.linkedin.com/in/sergio-david-sepulveda-montoya-7945351a8/
-- Portfolio: file:///C:/Users/Sergio%20david/Downloads/Hoja%20de%20vida/portafolio/index.html#habilidades
+- Portfolio: https://53r610-d4v1d.github.io/Portafolio
 
