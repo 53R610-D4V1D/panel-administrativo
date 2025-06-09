@@ -4,34 +4,76 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\City;
+use App\Models\State;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Employees';
+    protected static ?string $navigationIcon = 'heroicon-s-users';
+    protected static ?string $navigationGroup = 'Employees Management';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required(),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required(),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required(),
+                Section::make('Personal Information')
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')->required(),
+                        Forms\Components\TextInput::make('email')->email()->required(),
+                        Forms\Components\TextInput::make('password')->password()->required()->hiddenOn('edit'),
+                    ]),
+                Section::make('Direccion Information')
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Select::make('country_id')
+                            ->relationship('country', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(
+                                function (Set $set, $state) {
+                                    $set('state_id', null);
+                                    $set('city_id', null);
+                                }
+                            ),
+                        Forms\Components\Select::make('state_id')
+                            ->options(fn(Get $get) => State::where('country_id', $get('country_id'))->pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(
+                                function (Set $set, $state) {
+                                    $set('city_id', null);
+                                }
+                            ),
+                        Forms\Components\Select::make('city_id')
+                            ->options(fn(Get $get) => City::where('state_id', $get('state_id'))->pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->live()
+                            ->preload(),
+                        Forms\Components\TextInput::make('address')
+                            ->required(),
+                        Forms\Components\TextInput::make('postal_code')
+                            ->required(),
+                    ])
             ]);
     }
 
@@ -43,9 +85,26 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('country.name')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('state.name')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('city.name')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('address')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('postal_code')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
